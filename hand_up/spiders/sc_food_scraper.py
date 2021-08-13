@@ -33,9 +33,15 @@ class QuotesSpider(scrapy.Spider):
             time_string = ''
             p = re.compile(r'<.*?>')
             for line in times:
+                days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
                 line = p.sub('', line)
-                #if regex match for weekdays and hours does not match continue
-                time_string += line + '\n'
+                hour_match = re.search(r'\d:\d{2}', line)
+                if(hour_match):
+                    time_string += line + '\n'
+                    continue
+                for day in days:
+                    if day in line:
+                        time_string += line + '\n'
 
             #this is a regex for finding where it says "Phone:" and extracting the phone number afterwards
             phone_match = re.search(r"Phone: (\(\d+\)) (\d+-\d+)", phone_soup)#phone number regex
@@ -81,8 +87,8 @@ class QuotesSpider(scrapy.Spider):
             #address extraction ends
 
             print(name, address, phone_num, email, weblink, time_string)
-            filename = f'sc_food_scrape_2.txt'
+            filename = f'sc_food_scrape_3.txt'
             with open(filename, 'a') as f:
-                f.write(name + '\n' + address + '\n' + phone_match.group(1) + phone_match.group(2) + '\n' + email + '\n' + weblink + time_string + '\n' + '\n')
+                f.write(name + '\n' + address + '\n' + phone_match.group(1) + phone_match.group(2) + '\n' + email + '\n' + weblink +'\n' + time_string + '\n' + '\n')
             self.log(f'Saved file {filename}')
     
